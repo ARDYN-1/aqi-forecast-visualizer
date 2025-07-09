@@ -2,7 +2,7 @@ import axios from 'axios';
 import { AQIData, ForecastData, LocationData } from '../types';
 
 const OPENWEATHER_API_KEY = 'demo_key'; // Replace with your actual API key
-const WAQI_API_KEY = 'demo_key'; // Replace with your actual API key
+const WAQI_API_KEY = '579b464db66ec23bdd000001cdd3946e44ce4aad7209ff7b23ac571b';
 
 export class AQIService {
   private static readonly BASE_URL = 'https://api.openweathermap.org/data/2.5';
