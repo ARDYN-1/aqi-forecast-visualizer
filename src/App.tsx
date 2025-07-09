@@ -5,7 +5,8 @@ import { LocationSearch } from './components/LocationSearch';
 import { AQICard } from './components/AQICard';
 import { ForecastChart } from './components/ForecastChart';
 import { HealthRecommendations } from './components/HealthRecommendations';
-import { AQIMap } from './components/AQIMap';
+import { InteractiveMap } from './components/InteractiveMap';
+import { AnimatedBackground } from './components/AnimatedBackground';
 import { LanguageSelector } from './components/LanguageSelector';
 import { useAQI } from './hooks/useAQI';
 import { useForecast } from './hooks/useForecast';
@@ -66,12 +67,9 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 relative overflow-hidden">
-      {/* Animated Background Pattern */}
-      <div className="absolute inset-0">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,rgba(59,130,246,0.1)_1px,transparent_0)] [background-size:20px_20px] animate-pulse"></div>
-        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-blue-400/5 to-green-400/5"></div>
-      </div>
+    <div className="min-h-screen relative overflow-hidden">
+      {/* Enhanced Animated Background */}
+      <AnimatedBackground />
       
       <div className="relative z-10">
         {/* Enhanced Header */}
@@ -179,7 +177,7 @@ function App() {
               
               {/* Mobile Map */}
               <div className="lg:hidden">
-                <AQIMap 
+                <InteractiveMap 
                   selectedLocation={selectedLocation}
                   onLocationSelect={handleLocationSelect}
                 />
@@ -192,7 +190,7 @@ function App() {
               
               {/* Desktop Map */}
               <div className="hidden lg:block">
-                <AQIMap 
+                <InteractiveMap 
                   selectedLocation={selectedLocation}
                   onLocationSelect={handleLocationSelect}
                 />

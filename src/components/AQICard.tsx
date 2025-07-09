@@ -2,6 +2,7 @@ import React from 'react';
 import { AQIData } from '../types';
 import { getAQILevel, formatTimestamp } from '../utils/aqiUtils';
 import { Wind, AlertTriangle, Thermometer, Activity, Eye, Droplets } from 'lucide-react';
+import { LoadingSpinner } from './LoadingSpinner';
 
 interface AQICardProps {
   data: AQIData;
@@ -12,26 +13,7 @@ export const AQICard: React.FC<AQICardProps> = ({ data, loading }) => {
   if (loading) {
     return (
       <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-gray-200">
-        <div className="animate-pulse space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="h-8 bg-gray-200 rounded-xl w-48"></div>
-            <div className="h-6 bg-gray-200 rounded w-16"></div>
-          </div>
-          <div className="text-center space-y-3">
-            <div className="h-16 bg-gray-200 rounded-xl w-24 mx-auto"></div>
-            <div className="h-8 bg-gray-200 rounded-full w-32 mx-auto"></div>
-            <div className="h-4 bg-gray-200 rounded w-48 mx-auto"></div>
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="h-20 bg-gray-200 rounded-xl"></div>
-            <div className="h-20 bg-gray-200 rounded-xl"></div>
-          </div>
-          <div className="grid grid-cols-4 gap-2">
-            {[...Array(4)].map((_, i) => (
-              <div key={i} className="h-16 bg-gray-200 rounded-lg"></div>
-            ))}
-          </div>
-        </div>
+        <LoadingSpinner message="Loading air quality data..." />
       </div>
     );
   }

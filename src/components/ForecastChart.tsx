@@ -2,6 +2,7 @@ import React from 'react';
 import { ForecastData } from '../types';
 import { formatTimestamp, getAQIColor, getAQILevel } from '../utils/aqiUtils';
 import { TrendingUp, TrendingDown, Minus, BarChart3 } from 'lucide-react';
+import { LoadingSpinner } from './LoadingSpinner';
 
 interface ForecastChartProps {
   forecast: ForecastData[];
@@ -12,15 +13,7 @@ export const ForecastChart: React.FC<ForecastChartProps> = ({ forecast, loading 
   if (loading) {
     return (
       <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-gray-200">
-        <div className="animate-pulse space-y-4">
-          <div className="h-6 bg-gray-200 rounded w-1/3"></div>
-          <div className="h-40 bg-gray-200 rounded-xl"></div>
-          <div className="grid grid-cols-6 gap-2">
-            {[...Array(6)].map((_, i) => (
-              <div key={i} className="h-16 bg-gray-200 rounded"></div>
-            ))}
-          </div>
-        </div>
+        <LoadingSpinner message="Loading forecast data..." />
       </div>
     );
   }
