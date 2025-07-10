@@ -1,6 +1,6 @@
 # 🌍 Air Quality Forecast Web App 
 
-A modern, AI-driven air quality visualization and forecasting web application, designed to deliver real-time and predictive AQI (Air Quality Index) data for **rural, semi-urban, and underserved regions**. Built with **React**, **TypeScript**, **Vite**, and **Tailwind CSS**, and integrated with **Bolt AI** for intelligent sensor-based air quality monitoring and forecasting.
+A modern, AI-driven air quality visualization and forecasting web application, designed to deliver real-time and predictive AQI (Air Quality Index) data for **rural, semi-urban, and underserved regions**. Built with **React**, **TypeScript**, **Vite**, and **Tailwind CSS**, and integrated for intelligent sensor-based air quality monitoring and forecasting.
 
 ---
 
