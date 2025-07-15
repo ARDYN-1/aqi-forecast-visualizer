@@ -56,7 +56,12 @@ export class AQIService {
       throw new Error('WAQI API key not configured');
     }
 
-    const response = await axios.get(`${this.WAQI_BASE_URL}/feed/geo:${location.coordinates.lat};${location.coordinates.lon}/`, {
+    // Use station ID if available for more accurate data
+    const endpoint = location.stationId 
+      ? `${this.WAQI_BASE_URL}/feed/@${location.stationId}/`
+      : `${this.WAQI_BASE_URL}/feed/geo:${location.coordinates.lat};${location.coordinates.lon}/`;
+
+    const response = await axios.get(endpoint, {
       params: { token: this.WAQI_API_KEY },
       timeout: 10000,
       headers: {
@@ -234,6 +239,7 @@ export class AQIService {
         return response.data.map((item: any) => ({
           city: item.name,
           country: item.country,
+          state: item.state,
           coordinates: {
             lat: item.lat,
             lon: item.lon
@@ -249,6 +255,135 @@ export class AQIService {
       location.city.toLowerCase().includes(query.toLowerCase()) ||
       location.country.toLowerCase().includes(query.toLowerCase())
     ).slice(0, 8);
+  }
+
+  // Enhanced search methods
+  static async searchNearbyStations(query: string): Promise<LocationData[]> {
+    try {
+      if (this.WAQI_API_KEY) {
+        const response = await axios.get(`${this.WAQI_BASE_URL}/search/`, {
+          params: {
+            token: this.WAQI_API_KEY,
+            keyword: query
+          },
+          timeout: 8000
+        });
+
+        if (response.data.status === 'ok' && response.data.data) {
+          return response.data.data.map((station: any) => ({
+            city: station.station.name.split(',')[0].trim(),
+            country: station.station.country || 'Unknown',
+            coordinates: {
+              lat: station.station.geo?.[0] || 0,
+              lon: station.station.geo?.[1] || 0
+            },
+            stationId: station.uid
+          })).filter((location: any) => 
+            location.coordinates.lat !== 0 && location.coordinates.lon !== 0
+          );
+        }
+      }
+    } catch (error) {
+      console.warn('WAQI station search failed:', error);
+    }
+    
+    return [];
+  }
+
+  static async searchByCoordinates(query: string): Promise<LocationData[]> {
+    // Check if query looks like coordinates (lat,lon)
+    const coordPattern = /^(-?\d+\.?\d*),\s*(-?\d+\.?\d*)$/;
+    const match = query.match(coordPattern);
+    
+    if (match) {
+      const lat = parseFloat(match[1]);
+      const lon = parseFloat(match[2]);
+      
+      if (lat >= -90 && lat <= 90 && lon >= -180 && lon <= 180) {
+        try {
+          const location = await this.reverseGeocode(lat, lon);
+          return [location];
+        } catch (error) {
+          console.warn('Coordinate search failed:', error);
+          return [{
+            city: `Location ${lat.toFixed(4)}, ${lon.toFixed(4)}`,
+            country: 'Coordinates',
+            coordinates: { lat, lon }
+          }];
+        }
+      }
+    }
+    
+    return [];
+  }
+
+  static async checkStationAvailability(location: LocationData): Promise<boolean> {
+    try {
+      if (this.WAQI_API_KEY) {
+        const response = await axios.get(`${this.WAQI_BASE_URL}/feed/geo:${location.coordinates.lat};${location.coordinates.lon}/`, {
+          params: { token: this.WAQI_API_KEY },
+          timeout: 5000
+        });
+        
+        return response.data.status === 'ok' && response.data.data?.aqi;
+      }
+    } catch (error) {
+      console.warn('Station availability check failed:', error);
+    }
+    
+    return false;
+  }
+
+  // Enhanced location search with WAQI stations
+  static async searchLocationWithStations(query: string): Promise<LocationData[]> {
+    const results: LocationData[] = [];
+    
+    try {
+      // Search WAQI stations first for most accurate data
+      if (this.WAQI_API_KEY) {
+        const stationResponse = await axios.get(`${this.WAQI_BASE_URL}/search/`, {
+          params: {
+            token: this.WAQI_API_KEY,
+            keyword: query
+          },
+          timeout: 8000
+        });
+
+        if (stationResponse.data.status === 'ok' && stationResponse.data.data) {
+          const stations = stationResponse.data.data
+            .filter((station: any) => station.station.geo && station.station.geo.length === 2)
+            .map((station: any) => ({
+              city: station.station.name.split(',')[0].trim(),
+              country: station.station.country || 'Unknown',
+              coordinates: {
+                lat: station.station.geo[0],
+                lon: station.station.geo[1]
+              },
+              stationId: station.uid,
+              hasMonitoringStation: true
+            }));
+          
+          results.push(...stations.slice(0, 5));
+        }
+      }
+
+      // Also search general locations
+      const generalLocations = await this.searchLocations(query);
+      
+      // Merge and deduplicate
+      const combined = [...results, ...generalLocations];
+      const unique = combined.filter((location, index, self) => 
+        index === self.findIndex(l => 
+          Math.abs(l.coordinates.lat - location.coordinates.lat) < 0.01 &&
+          Math.abs(l.coordinates.lon - location.coordinates.lon) < 0.01
+        )
+      );
+      
+      return unique.slice(0, 10);
+    } catch (error) {
+      console.error('Enhanced location search failed:', error);
+      return this.searchLocations(query);
+    }
   }
 
   static async reverseGeocode(lat: number, lon: number): Promise<LocationData> {

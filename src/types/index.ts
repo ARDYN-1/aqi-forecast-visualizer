@@ -35,10 +35,14 @@ export interface HealthRecommendation {
 export interface LocationData {
   city: string;
   country: string;
+  state?: string;
+  region?: string;
   coordinates: {
     lat: number;
     lon: number;
   };
+  stationId?: string;
+  hasMonitoringStation?: boolean;
 }
 
 export type Language = 'en' | 'hi' | 'bn';
