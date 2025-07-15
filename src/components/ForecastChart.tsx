@@ -32,8 +32,8 @@ export const ForecastChart: React.FC<ForecastChartProps> = ({ forecast, loading 
 
   const next24Hours = forecast.slice(0, 24);
   const next7Days = forecast.filter((_, index) => index % 24 === 0).slice(0, 7);
-  const maxAqi = Math.max(...next24Hours.map(f => f.aqi));
-  const minAqi = Math.min(...next24Hours.map(f => f.aqi));
+  const maxAqi = next24Hours.length > 0 ? Math.max(...next24Hours.map(f => f.aqi)) : 100;
+  const minAqi = next24Hours.length > 0 ? Math.min(...next24Hours.map(f => f.aqi)) : 50;
   const currentAqi = next24Hours[0]?.aqi || 0;
   const futureAqi = next24Hours[12]?.aqi || 0;
 
@@ -69,10 +69,10 @@ export const ForecastChart: React.FC<ForecastChartProps> = ({ forecast, loading 
       {/* 24-Hour Chart */}
       <div className="mb-8">
         <h4 className="text-sm font-medium text-gray-700 mb-4">Next 24 Hours</h4>
-        <div className="relative h-40 mb-4">
+        <div className="relative h-32 mb-4">
           <div className="absolute inset-0 flex items-end justify-between gap-1">
             {next24Hours.map((item, index) => {
-              const height = ((item.aqi - minAqi) / (maxAqi - minAqi)) * 100;
+              const height = maxAqi > minAqi ? ((item.aqi - minAqi) / (maxAqi - minAqi)) * 100 : 50;
               const level = getAQILevel(item.aqi);
               
               return (
@@ -80,12 +80,12 @@ export const ForecastChart: React.FC<ForecastChartProps> = ({ forecast, loading 
                   <div className="relative">
                     <div 
                       className={`w-full min-w-[8px] rounded-t transition-all duration-300 hover:opacity-80 cursor-pointer ${getAQIColor(item.aqi)}`}
-                      style={{ height: `${Math.max(height * 1.4, 20)}px` }}
+                      style={{ height: `${Math.max(height * 1.2, 16)}px` }}
                       title={`${formatTimestamp(item.timestamp)}: AQI ${item.aqi} (${level.level})`}
                     ></div>
                     
                     {/* Tooltip */}
-                    <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
+                    <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10">
                       <div className="bg-gray-900 text-white text-xs rounded-lg px-2 py-1 whitespace-nowrap">
                         <div className="font-medium">{item.aqi} AQI</div>
                         <div className="text-gray-300">{formatTimestamp(item.timestamp)}</div>
@@ -99,9 +99,9 @@ export const ForecastChart: React.FC<ForecastChartProps> = ({ forecast, loading 
         </div>
 
         {/* Time labels */}
-        <div className="grid grid-cols-6 gap-2 text-center">
+        <div className="flex justify-between text-center">
           {next24Hours.filter((_, index) => index % 4 === 0).map((item, index) => (
-            <div key={index} className="text-xs text-gray-500">
+            <div key={index} className="text-xs text-gray-500 flex-1">
               {formatTimestamp(item.timestamp)}
             </div>
           ))}
@@ -135,20 +135,20 @@ export const ForecastChart: React.FC<ForecastChartProps> = ({ forecast, loading 
       </div>
 
       {/* Statistics */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-3 gap-3">
         <div className="bg-gray-50 rounded-xl p-3 text-center">
           <div className="text-xs text-gray-500 mb-1">24h Average</div>
-          <div className="text-lg font-semibold text-gray-900">
-            {Math.round(next24Hours.reduce((sum, item) => sum + item.aqi, 0) / next24Hours.length)}
+          <div className="text-base font-semibold text-gray-900">
+            {next24Hours.length > 0 ? Math.round(next24Hours.reduce((sum, item) => sum + item.aqi, 0) / next24Hours.length) : 0}
           </div>
         </div>
         <div className="bg-gray-50 rounded-xl p-3 text-center">
           <div className="text-xs text-gray-500 mb-1">24h Peak</div>
-          <div className="text-lg font-semibold text-gray-900">{maxAqi}</div>
+          <div className="text-base font-semibold text-gray-900">{maxAqi}</div>
         </div>
         <div className="bg-gray-50 rounded-xl p-3 text-center">
           <div className="text-xs text-gray-500 mb-1">24h Low</div>
-          <div className="text-lg font-semibold text-gray-900">{minAqi}</div>
+          <div className="text-base font-semibold text-gray-900">{minAqi}</div>
         </div>
       </div>
     </div>

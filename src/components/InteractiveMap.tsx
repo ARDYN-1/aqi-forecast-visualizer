@@ -131,8 +131,8 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({ selectedLocation
           {/* Interactive World Map */}
           <div 
             ref={mapRef}
-            className="relative bg-gradient-to-br from-blue-100 via-blue-50 to-green-50 rounded-xl overflow-hidden border border-gray-200 mb-6"
-            style={{ height: '400px' }}
+            className="relative bg-gradient-to-br from-blue-100 via-blue-50 to-green-50 rounded-xl overflow-hidden border border-gray-200 mb-6 touch-pan-x touch-pan-y"
+            style={{ height: '350px' }}
           >
             {/* Animated Background Grid */}
             <div className="absolute inset-0 opacity-20">
@@ -147,34 +147,34 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({ selectedLocation
 
             {/* World Map SVG */}
             <svg 
-              viewBox="0 0 1000 500" 
+              viewBox="0 0 800 400" 
               className="absolute inset-0 w-full h-full opacity-30"
               style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))' }}
             >
               {/* Simplified world continents */}
               <g fill="currentColor" className="text-gray-400">
                 {/* North America */}
-                <path d="M150 120 Q200 100 250 120 L280 140 Q300 130 320 140 L340 160 Q360 150 380 160 L400 180 Q420 170 440 180 L460 200 Q480 190 500 200 L520 220 Q540 210 560 220 L580 240 Q600 230 620 240 L640 260 Q660 250 680 260 L700 280 Q720 270 740 280 L760 300 Q780 290 800 300 L820 320 Q840 310 860 320 L880 340 Q900 330 920 340 L940 360 Q960 350 980 360" 
+                <path d="M120 100 Q160 80 200 100 L240 120 Q260 110 280 120 L300 140 Q320 130 340 140" 
                       stroke="currentColor" strokeWidth="2" fill="none"/>
                 
                 {/* South America */}
-                <path d="M300 280 Q320 260 340 280 L360 300 Q380 290 400 300 L420 320 Q440 310 460 320 L480 340 Q500 330 520 340 L540 360 Q560 350 580 360 L600 380 Q620 370 640 380" 
+                <path d="M240 220 Q260 200 280 220 L300 240 Q320 230 340 240 L360 260 Q380 250 400 260" 
                       stroke="currentColor" strokeWidth="2" fill="none"/>
                 
                 {/* Europe */}
-                <path d="M480 100 Q500 80 520 100 L540 120 Q560 110 580 120 L600 140 Q620 130 640 140" 
+                <path d="M380 80 Q400 60 420 80 L440 100 Q460 90 480 100" 
                       stroke="currentColor" strokeWidth="2" fill="none"/>
                 
                 {/* Africa */}
-                <path d="M500 180 Q520 160 540 180 L560 200 Q580 190 600 200 L620 220 Q640 210 660 220 L680 240 Q700 230 720 240 L740 260 Q760 250 780 260" 
+                <path d="M400 140 Q420 120 440 140 L460 160 Q480 150 500 160 L520 180 Q540 170 560 180" 
                       stroke="currentColor" strokeWidth="2" fill="none"/>
                 
                 {/* Asia */}
-                <path d="M640 80 Q680 60 720 80 L760 100 Q800 90 840 100 L880 120 Q920 110 960 120" 
+                <path d="M500 60 Q540 40 580 60 L620 80 Q660 70 700 80" 
                       stroke="currentColor" strokeWidth="2" fill="none"/>
                 
                 {/* Australia */}
-                <path d="M780 320 Q820 300 860 320 L900 340 Q940 330 980 340" 
+                <path d="M580 260 Q620 240 660 260 L700 280" 
                       stroke="currentColor" strokeWidth="2" fill="none"/>
               </g>
             </svg>
@@ -229,7 +229,7 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({ selectedLocation
 
                   {/* Detailed Tooltip */}
                   {(isHovered || isSelected) && (
-                    <div className="absolute top-8 left-1/2 transform -translate-x-1/2 bg-white/95 backdrop-blur-sm rounded-lg shadow-xl border border-gray-200 p-3 min-w-48 z-30">
+                    <div className="absolute top-8 left-1/2 transform -translate-x-1/2 bg-white/95 backdrop-blur-sm rounded-lg shadow-xl border border-gray-200 p-3 min-w-40 z-30 pointer-events-none">
                       <div className="flex items-center gap-2 mb-2">
                         <MapPin className="h-4 w-4 text-gray-500" />
                         <div>
@@ -255,11 +255,11 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({ selectedLocation
             })}
 
             {/* Wind Flow Animation */}
-            <div className="absolute inset-0 pointer-events-none">
+            <div className="absolute inset-0 pointer-events-none overflow-hidden">
               {[...Array(5)].map((_, i) => (
                 <div
                   key={i}
-                  className="absolute w-1 h-1 bg-blue-400 rounded-full opacity-60"
+                  className="absolute w-1 h-1 bg-blue-400 rounded-full opacity-40"
                   style={{
                     left: `${(animationPhase * 2 + i * 20) % 100}%`,
                     top: `${30 + Math.sin(animationPhase * 0.1 + i) * 20}%`,
@@ -337,9 +337,11 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({ selectedLocation
           </div>
 
           {/* Real-time Updates Indicator */}
-          <div className="mt-4 flex items-center justify-center gap-2 text-xs text-gray-500">
+          <div className="mt-4 flex flex-col sm:flex-row items-center justify-center gap-2 text-xs text-gray-500 text-center">
             <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-            <span>Data updates every 5 minutes • Click any location for detailed analysis</span>
+            <span>Data updates every 5 minutes</span>
+            <span className="hidden sm:inline">•</span>
+            <span>Click any location for detailed analysis</span>
           </div>
         </>
       )}

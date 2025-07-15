@@ -47,9 +47,9 @@ export const AQICard: React.FC<AQICardProps> = ({ data, loading }) => {
           <div className="text-3xl">{aqiLevel.emoji}</div>
           <div>
             <h3 className="text-xl font-bold text-gray-900">{data.location.city}</h3>
-            <p className="text-sm text-gray-500 flex items-center gap-1">
+            <p className="text-xs text-gray-500 flex items-center gap-1">
               <Wind className="h-3 w-3" />
-              Updated {formatTimestamp(data.timestamp)}
+              {data.location.country} • Updated {formatTimestamp(data.timestamp)}
             </p>
           </div>
         </div>
@@ -62,13 +62,13 @@ export const AQICard: React.FC<AQICardProps> = ({ data, loading }) => {
       {/* Main AQI Display */}
       <div className="text-center mb-8">
         <div className="relative inline-block">
-          <div className="text-6xl font-bold text-gray-900 mb-2">{data.aqi}</div>
-          <div className="absolute -top-2 -right-8 text-sm text-gray-500">AQI</div>
+          <div className="text-5xl md:text-6xl font-bold text-gray-900 mb-2">{data.aqi}</div>
+          <div className="absolute -top-1 -right-6 text-xs text-gray-500 font-medium">AQI</div>
         </div>
         <div className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-medium text-white ${aqiLevel.color} shadow-lg`}>
           {aqiLevel.level}
         </div>
-        <p className="text-sm text-gray-600 mt-3 max-w-xs mx-auto leading-relaxed">
+        <p className="text-xs text-gray-600 mt-3 max-w-xs mx-auto leading-relaxed">
           {aqiLevel.message}
         </p>
       </div>
@@ -122,14 +122,14 @@ export const AQICard: React.FC<AQICardProps> = ({ data, loading }) => {
       </div>
 
       {/* Health Impact Indicator */}
-      <div className="mt-6 p-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl border border-gray-200">
+      <div className="mt-6 p-3 bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl border border-gray-200">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className={`w-3 h-3 rounded-full ${aqiLevel.color}`}></div>
-            <span className="text-sm font-medium text-gray-700">Health Impact</span>
+            <span className="text-xs font-medium text-gray-700">Health Impact</span>
           </div>
           <div className="text-right">
-            <div className="text-sm font-semibold text-gray-900">{aqiLevel.level}</div>
+            <div className="text-xs font-semibold text-gray-900">{aqiLevel.level}</div>
             <div className="text-xs text-gray-500">Current Status</div>
           </div>
         </div>

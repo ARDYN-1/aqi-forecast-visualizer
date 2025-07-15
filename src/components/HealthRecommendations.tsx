@@ -72,7 +72,10 @@ export const HealthRecommendations: React.FC<HealthRecommendationsProps> = ({ da
       </div>
 
       {/* Current Status */}
-      <div className={`p-4 rounded-xl mb-6 border-2 ${aqiLevel.color} bg-opacity-10 border-opacity-20`}>
+      <div className={`p-4 rounded-xl mb-6 border-2 border-opacity-20`} style={{ 
+        backgroundColor: `${aqiLevel.color.replace('bg-', '').replace('-500', '')}-50`,
+        borderColor: `${aqiLevel.color.replace('bg-', '').replace('-500', '')}-200`
+      }}>
         <div className="flex items-center gap-3 mb-3">
           <span className="text-3xl">{aqiLevel.emoji}</span>
           <div>
@@ -84,7 +87,7 @@ export const HealthRecommendations: React.FC<HealthRecommendationsProps> = ({ da
         {/* Risk Level Indicator */}
         <div className="flex items-center gap-2 mt-3">
           <span className="text-xs font-medium text-gray-500">Risk Level:</span>
-          <div className="flex-1 bg-gray-200 rounded-full h-2">
+          <div className="flex-1 bg-gray-200 rounded-full h-2 overflow-hidden">
             <div 
               className={`h-2 rounded-full ${aqiLevel.color}`}
               style={{ width: `${Math.min((data.aqi / 300) * 100, 100)}%` }}
@@ -130,7 +133,7 @@ export const HealthRecommendations: React.FC<HealthRecommendationsProps> = ({ da
 
       {/* Health Tips */}
       <div className="space-y-4">
-        <div className="p-4 bg-gradient-to-r from-green-50 to-blue-50 rounded-xl border border-green-200">
+        <div className="p-3 bg-gradient-to-r from-green-50 to-blue-50 rounded-xl border border-green-200">
           <div className="flex items-center gap-2 mb-2">
             <Zap className="h-4 w-4 text-green-600" />
             <span className="text-sm font-semibold text-green-900">Quick Tip</span>
@@ -144,7 +147,7 @@ export const HealthRecommendations: React.FC<HealthRecommendationsProps> = ({ da
         </div>
 
         {data.aqi > 150 && (
-          <div className="p-4 bg-red-50 rounded-xl border border-red-200">
+          <div className="p-3 bg-red-50 rounded-xl border border-red-200">
             <div className="flex items-center gap-2 mb-2">
               <AlertCircle className="h-4 w-4 text-red-600" />
               <span className="text-sm font-semibold text-red-900">Health Alert</span>
@@ -158,7 +161,7 @@ export const HealthRecommendations: React.FC<HealthRecommendationsProps> = ({ da
 
       {/* Emergency Contact */}
       {data.aqi > 200 && (
-        <div className="mt-4 p-3 bg-red-100 rounded-xl border-2 border-red-300">
+        <div className="mt-4 p-3 bg-red-100 rounded-xl border-2 border-red-300 animate-pulse">
           <div className="text-center">
             <AlertCircle className="h-6 w-6 text-red-600 mx-auto mb-2" />
             <p className="text-sm font-bold text-red-900">Emergency Level Air Quality</p>
