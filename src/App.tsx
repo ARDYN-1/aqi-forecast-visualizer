@@ -7,16 +7,19 @@ import { ForecastChart } from './components/ForecastChart';
 import { HealthRecommendations } from './components/HealthRecommendations';
 import { InteractiveMap } from './components/InteractiveMap';
 import { LanguageSelector } from './components/LanguageSelector';
+import { APIStatus } from './components/APIStatus';
+import { SetupGuide } from './components/SetupGuide';
 import { useAQI } from './hooks/useAQI';
 import { useForecast } from './hooks/useForecast';
 import { useGeolocation } from './hooks/useGeolocation';
-import { Wind, Zap, Globe, RefreshCw, AlertCircle } from 'lucide-react';
+import { Wind, Zap, Globe, RefreshCw, AlertCircle, Settings, X } from 'lucide-react';
 
 function App() {
   const [selectedLocation, setSelectedLocation] = useState<LocationData | null>(null);
   const [language, setLanguage] = useState<Language>('en');
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
   const [isOnline, setIsOnline] = useState(navigator.onLine);
+  const [showSetupGuide, setShowSetupGuide] = useState(false);
 
   const { location: geoLocation, loading: geoLoading, getCurrentLocation } = useGeolocation();
   const { data: aqiData, loading: aqiLoading, error: aqiError } = useAQI(selectedLocation);
@@ -105,6 +108,15 @@ function App() {
                 >
                   <RefreshCw className={`h-4 w-4 ${aqiLoading ? 'animate-spin' : ''}`} />
                 </button>
+
+                {/* Setup Guide Button */}
+                <button
+                  onClick={() => setShowSetupGuide(true)}
+                  className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+                  title="API Setup Guide"
+                >
+                  <Settings className="h-4 w-4" />
+                </button>
               </div>
             </div>
           </div>
@@ -183,6 +195,11 @@ function App() {
             <div className="lg:col-span-1">
               <ForecastChart forecast={forecast} loading={forecastLoading} />
             </div>
+          </div>
+
+          {/* API Status */}
+          <div className="mb-8">
+            <APIStatus />
           </div>
 
           {/* Interactive Map */}
@@ -281,6 +298,21 @@ function App() {
           </div>
         </footer>
       </div>
+
+      {/* Setup Guide Modal */}
+      {showSetupGuide && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="relative max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <button
+              onClick={() => setShowSetupGuide(false)}
+              className="absolute top-4 right-4 z-10 p-2 bg-white/90 hover:bg-white rounded-full shadow-lg transition-colors"
+            >
+              <X className="h-5 w-5 text-gray-600" />
+            </button>
+            <SetupGuide />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
