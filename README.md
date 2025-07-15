@@ -54,6 +54,7 @@ This app provides comprehensive air quality monitoring by integrating multiple d
 - Automatic failover and data source health monitoring
 
 ---
+## Host: https://aqi-forecast-visualizer.vercel.app/
 
 ## 🛠️ Setup Instructions
 
