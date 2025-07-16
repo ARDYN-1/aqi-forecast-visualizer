@@ -43,6 +43,9 @@ export interface LocationData {
   };
   stationId?: string;
   hasMonitoringStation?: boolean;
+  type?: 'city' | 'station' | 'coordinate' | 'recent' | 'favorite';
+  relevanceScore?: number;
+  distance?: number;
 }
 
 export type Language = 'en' | 'hi' | 'bn';

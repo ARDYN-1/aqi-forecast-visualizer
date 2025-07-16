@@ -224,37 +224,17 @@ export class AQIService {
   }
 
   static async searchLocations(query: string): Promise<LocationData[]> {
-    try {
-      // Use OpenWeather Geocoding API for real location search
-      if (this.OPENWEATHER_API_KEY) {
-        const response = await axios.get(`https://api.openweathermap.org/geo/1.0/direct`, {
-          params: {
-            q: query,
-            limit: 10,
-            appid: this.OPENWEATHER_API_KEY
-          },
-          timeout: 5000
-        });
-
-        return response.data.map((item: any) => ({
-          city: item.name,
-          country: item.country,
-          state: item.state,
-          coordinates: {
-            lat: item.lat,
-            lon: item.lon
-          }
-        }));
-      }
-    } catch (error) {
-      console.warn('Location search API failed, using fallback:', error);
-    }
-
-    // Fallback to predefined locations
-    return this.mockLocations.filter(location => 
-      location.city.toLowerCase().includes(query.toLowerCase()) ||
-      location.country.toLowerCase().includes(query.toLowerCase())
-    ).slice(0, 8);
+    // Delegate to SearchService for optimized search
+    const { SearchService } = await import('./searchService');
+    const results = await SearchService.searchLocations(query, undefined, { maxResults: 8 });
+    return results.map(result => ({
+      city: result.city,
+      country: result.country,
+      state: result.state,
+      coordinates: result.coordinates,
+      stationId: result.stationId,
+      hasMonitoringStation: result.hasStation
+    }));
   }
 
   // Expose mock locations for fallback use
@@ -263,65 +243,27 @@ export class AQIService {
   }
 
   // Enhanced search methods
+  // Deprecated - use SearchService instead
   static async searchNearbyStations(query: string): Promise<LocationData[]> {
-    try {
-      if (this.WAQI_API_KEY) {
-        const response = await axios.get(`${this.WAQI_BASE_URL}/search/`, {
-          params: {
-            token: this.WAQI_API_KEY,
-            keyword: query
-          },
-          timeout: 8000
-        });
-
-        if (response.data.status === 'ok' && response.data.data) {
-          return response.data.data.map((station: any) => ({
-            city: station.station.name.split(',')[0].trim(),
-            country: station.station.country || 'Unknown',
-            coordinates: {
-              lat: station.station.geo?.[0] || 0,
-              lon: station.station.geo?.[1] || 0
-            },
-            stationId: station.uid
-          })).filter((location: any) => 
-            location.coordinates.lat !== 0 && location.coordinates.lon !== 0
-          );
-        }
-      }
-    } catch (error) {
-      console.warn('WAQI station search failed:', error);
-    }
-    
-    return [];
+    const { SearchService } = await import('./searchService');
+    const results = await SearchService.searchLocations(query, undefined, { 
+      includeStations: true, 
+      includeCoordinates: false,
+      maxResults: 6 
+    });
+    return results.filter(r => r.hasStation);
   }
 
+  // Deprecated - use SearchService instead  
   static async searchByCoordinates(query: string): Promise<LocationData[]> {
-    // Check if query looks like coordinates (lat,lon)
-    const coordPattern = /^(-?\d+\.?\d*),\s*(-?\d+\.?\d*)$/;
-    const match = query.match(coordPattern);
-    
-    if (match) {
-      const lat = parseFloat(match[1]);
-      const lon = parseFloat(match[2]);
-      
-      if (lat >= -90 && lat <= 90 && lon >= -180 && lon <= 180) {
-        try {
-          const location = await this.reverseGeocode(lat, lon);
-          return [location];
-        } catch (error) {
-          console.warn('Coordinate search failed:', error);
-          return [{
-            city: `Location ${lat.toFixed(4)}, ${lon.toFixed(4)}`,
-            country: 'Coordinates',
-            coordinates: { lat, lon }
-          }];
-        }
-      }
-    }
-    
-    return [];
+    const { SearchService } = await import('./searchService');
+    const results = await SearchService.searchLocations(query, undefined, { 
+      includeStations: false, 
+      includeCoordinates: true,
+      maxResults: 1 
+    });
+    return results.filter(r => r.type === 'coordinate');
   }
-
   static async checkStationAvailability(location: LocationData): Promise<boolean> {
     try {
       if (this.WAQI_API_KEY) {
@@ -392,36 +334,9 @@ export class AQIService {
   }
 
   static async reverseGeocode(lat: number, lon: number): Promise<LocationData> {
-    try {
-      if (this.OPENWEATHER_API_KEY) {
-        const response = await axios.get(`https://api.openweathermap.org/geo/1.0/reverse`, {
-          params: {
-            lat,
-            lon,
-            limit: 1,
-            appid: this.OPENWEATHER_API_KEY
-          },
-          timeout: 5000
-        });
-
-        if (response.data.length > 0) {
-          const location = response.data[0];
-          return {
-            city: location.name,
-            country: location.country,
-            coordinates: { lat, lon }
-          };
-        }
-      }
-    } catch (error) {
-      console.warn('Reverse geocoding failed:', error);
-    }
-
-    return {
-      city: 'Current Location',
-      country: 'Unknown',
-      coordinates: { lat, lon }
-    };
+    // Delegate to SearchService for optimized reverse geocoding
+    const { SearchService } = await import('./searchService');
+    return SearchService.reverseGeocode(lat, lon);
   }
 
   // Enhanced forecast generation with historical patterns
