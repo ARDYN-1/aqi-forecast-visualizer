@@ -257,6 +257,11 @@ export class AQIService {
     ).slice(0, 8);
   }
 
+  // Expose mock locations for fallback use
+  static getMockLocations(): LocationData[] {
+    return this.mockLocations;
+  }
+
   // Enhanced search methods
   static async searchNearbyStations(query: string): Promise<LocationData[]> {
     try {
